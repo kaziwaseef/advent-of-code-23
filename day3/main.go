@@ -10,10 +10,28 @@ import (
 func Part1() {
 	fmt.Println("Day 3 Part 1")
 	input := utils.ReadFileAsLines("day3/input.txt")
-	alg(&input)
+	fmt.Println(alg(&input, ""))
 }
 
-func alg(input *[]string) {
+func Part2() {
+	fmt.Println("Day 3 Part 2")
+	input := utils.ReadFileAsLines("day3/input.txt")
+	fmt.Println(alg(&input, "gearRatio"))
+}
+
+type gearStruct struct {
+	i     int
+	j     int
+	left  int
+	right int
+}
+
+func (g gearStruct) ratio() int {
+	return g.left * g.right
+}
+
+func alg(input *[]string, constraint string) int {
+	gears := make([]gearStruct, 0)
 	numChar := ""
 	numLen := 0
 	sum := 0
@@ -27,7 +45,9 @@ func alg(input *[]string) {
 					num, err := strconv.Atoi(numChar)
 					utils.CheckErr(err)
 					aroundIndices := getAroundIndices(i, len(*input), j, len(line), num, numLen)
-					if isValidNumber(input, &aroundIndices) {
+					if constraint == "gearRatio" {
+						updateIfGearRatio(num, input, &aroundIndices, &gears)
+					} else if isValidNumber(input, &aroundIndices) {
 						sum += num
 					}
 				}
@@ -44,13 +64,21 @@ func alg(input *[]string) {
 			utils.CheckErr(err)
 			horizontal := len((*input)[0]) - 1
 			aroundIndices := getAroundIndices(i, len(*input), horizontal, horizontal+1, num, numLen)
-			if isValidNumber(input, &aroundIndices) {
+			if constraint == "gearRatio" {
+				updateIfGearRatio(num, input, &aroundIndices, &gears)
+			} else if isValidNumber(input, &aroundIndices) {
 				sum += num
 			}
 		}
 	}
 
-	fmt.Println(sum)
+	if constraint == "gearRatio" {
+		for _, gear := range gears {
+			sum += gear.ratio()
+		}
+	}
+
+	return sum
 }
 
 func getAroundIndices(i, iLen, j, jLen, num, numLen int) [][]int {
@@ -113,4 +141,24 @@ func isValidNumber(input *[]string, aroundIndices *[][]int) bool {
 		}
 	}
 	return false
+}
+
+func updateIfGearRatio(num int, input *[]string, aroundIndices *[][]int, gears *[]gearStruct) {
+	for _, indices := range *aroundIndices {
+		char := string((*input)[indices[0]][indices[1]])
+		if char == "*" {
+			matched := false
+			for i, gear := range *gears {
+				if gear.i == indices[0] && gear.j == indices[1] {
+					gear.right = num
+					(*gears)[i] = gear
+					matched = true
+					break
+				}
+			}
+			if !matched {
+				*gears = append(*gears, gearStruct{i: indices[0], j: indices[1], left: num})
+			}
+		}
+	}
 }
