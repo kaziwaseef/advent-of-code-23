@@ -15,8 +15,22 @@ func Part1() {
 	seedsString := input[0]
 	seedInput := makeSeedInput(seedsString)
 	mapInput := input[2:]
-	sdm := generateSDM(&mapInput)
-	values := getValues(seedInput, "seed", "location", sdm)
+	alg(&mapInput, &seedInput)
+}
+
+func Part2() {
+	fmt.Println("Day 5 Part 2")
+	input := utils.ReadFileAsLines("day5/input.txt")
+	seedsString := input[0]
+	seedInput := makeRangeSeedInput(seedsString)
+	fmt.Println(len(seedInput))
+	mapInput := input[2:]
+	alg(&mapInput, &seedInput)
+}
+
+func alg(mapInput *[]string, seedInput *[]int) {
+	sdm := generateSDM(mapInput)
+	values := getValues(*seedInput, "seed", "location", sdm)
 	minValue := getMinValueIndex(&values)
 	fmt.Println(minValue)
 }
@@ -29,6 +43,22 @@ func makeSeedInput(seedString string) []int {
 		num, err := strconv.Atoi(str)
 		utils.CheckErr(err)
 		output = append(output, num)
+	}
+	return output
+}
+
+func makeRangeSeedInput(seedString string) []int {
+	seedString = strings.ReplaceAll(seedString, "seeds: ", "")
+	seedStrings := strings.Split(seedString, " ")
+	output := make([]int, 0)
+	for i := 0; i < len(seedStrings); i += 2 {
+		num, err := strconv.Atoi(seedStrings[i])
+		utils.CheckErr(err)
+		r, err := strconv.Atoi(seedStrings[i+1])
+		utils.CheckErr(err)
+		for j := 0; j < r; j++ {
+			output = append(output, num+j)
+		}
 	}
 	return output
 }
