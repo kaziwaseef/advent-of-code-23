@@ -19,19 +19,20 @@ type card struct {
 	id             int
 	winningNumbers map[int]bool
 	numbers        []int
-	score          int
 }
 
-func (c *card) calculateScore() {
+func (c card) calculateScore() int {
+	score := 0
 	for _, num := range c.numbers {
 		if c.winningNumbers[num] {
-			if c.score == 0 {
-				c.score = 1
+			if score == 0 {
+				score = 1
 			} else {
-				c.score *= 2
+				score *= 2
 			}
 		}
 	}
+	return score
 }
 
 func generateCards(input *[]string) []card {
@@ -66,8 +67,7 @@ func generateCards(input *[]string) []card {
 func alg(cards *[]card) int {
 	sum := 0
 	for _, card := range *cards {
-		card.calculateScore()
-		sum += card.score
+		sum += card.calculateScore()
 	}
 	return sum
 }
