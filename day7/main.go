@@ -12,7 +12,16 @@ import (
 func Part1() {
 	fmt.Println("Day 7 Part 1")
 	input := utils.ReadFileAsLines("day7/input.txt")
-	hands := formatInput(&input)
+	hands := formatInput(&input, "")
+	slices.SortFunc(hands, comparator)
+	fmt.Println(calculateScore(&hands))
+}
+
+func Part2() {
+	fmt.Println("Day 7 Part 2")
+	cardOrder["J"] = 0
+	input := utils.ReadFileAsLines("day7/input.txt")
+	hands := formatInput(&input, "joker")
 	slices.SortFunc(hands, comparator)
 	fmt.Println(calculateScore(&hands))
 }
@@ -30,13 +39,13 @@ func comparator(left hand, right hand) int {
 	return left.compare(right)
 }
 
-func formatInput(input *[]string) []hand {
+func formatInput(input *[]string, rule string) []hand {
 	hands := make([]hand, 0)
 	for _, line := range *input {
 		handInput := strings.Split(line, " ")
 		bid, err := strconv.Atoi(handInput[1])
 		utils.CheckErr(err)
-		hands = append(hands, hand{cards: handInput[0], bid: bid})
+		hands = append(hands, hand{cards: handInput[0], bid: bid, rule: rule})
 	}
 	return hands
 }
@@ -45,6 +54,7 @@ type hand struct {
 	cards string
 	bid   int
 	power int
+	rule  string
 }
 
 func (h hand) getScore(rank int) int {
@@ -55,18 +65,58 @@ func (h *hand) getPower() int {
 	if h.power > 0 {
 		return h.power
 	}
-	return h.calculatePower()
+	power := h.calculatePower()
+	h.power = power
+	return power
 }
 
-func (h *hand) calculatePower() int {
+// func deleteMePowerName(power int) string {
+// 	switch power {
+// 	case 1:
+// 		return "High Card"
+// 	case 2:
+// 		return "1 Pair"
+// 	case 3:
+// 		return "2 Pair"
+// 	case 4:
+// 		return "3 of a kind"
+// 	case 5:
+// 		return "Full House"
+// 	case 6:
+// 		return "Four of a kind"
+// 	case 7:
+// 		return "Five of a kind"
+// 	default:
+// 		panic("BAD CARD POWER")
+// 	}
+// }
+
+func (h hand) calculatePower() int {
 	cardMap := make(map[string]int)
+	jokers := 0
 	for _, card := range h.cards {
 		cardStr := string(card)
+		if h.rule == "joker" && cardStr == "J" {
+			jokers += 1
+			continue
+		}
 		if v, exists := cardMap[cardStr]; exists {
 			cardMap[cardStr] = v + 1
 			continue
 		}
 		cardMap[cardStr] = 1
+	}
+	max := 0
+	for _, num := range cardMap {
+		if num > max {
+			max = num
+		}
+	}
+	if h.rule == "joker" && jokers > 0 {
+		max += jokers
+		if jokers == 5 {
+			cardMap["J"] = 5
+		}
 	}
 	cardMapLength := len(cardMap)
 	if cardMapLength == 1 {
@@ -74,12 +124,6 @@ func (h *hand) calculatePower() int {
 		return 7
 	}
 	if cardMapLength == 2 {
-		max := 0
-		for _, num := range cardMap {
-			if num > max {
-				max = num
-			}
-		}
 		if max == 4 {
 			// 4 of a kind
 			return 6
@@ -88,12 +132,6 @@ func (h *hand) calculatePower() int {
 		return 5
 	}
 	if cardMapLength == 3 {
-		max := 0
-		for _, num := range cardMap {
-			if num > max {
-				max = num
-			}
-		}
 		if max == 3 {
 			// 3 of a kind
 			return 4
