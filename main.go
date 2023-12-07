@@ -9,6 +9,7 @@ import (
 	"github.com/kaziwaseef/advent-of-code-23/day4"
 	"github.com/kaziwaseef/advent-of-code-23/day5"
 	"github.com/kaziwaseef/advent-of-code-23/day6"
+	"github.com/kaziwaseef/advent-of-code-23/day7"
 )
 
 func main() {
@@ -30,5 +31,8 @@ func main() {
 	fmt.Println("---")
 	day6.Part1()
 	day6.Part2()
+	fmt.Println("---")
+	day7.Part1()
+	// day7.Part2()
 	fmt.Println("---")
 }
