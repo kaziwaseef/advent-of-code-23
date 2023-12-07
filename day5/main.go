@@ -31,7 +31,7 @@ func Part2() {
 func alg(mapInput *[]string, seedInput *[]int) {
 	sdm := generateSDM(mapInput)
 	values := getValues(*seedInput, "seed", "location", sdm)
-	minValue := getMinValueIndex(&values)
+	minValue := getMinValue(&values)
 	fmt.Println(minValue)
 }
 
@@ -63,7 +63,7 @@ func makeRangeSeedInput(seedString string) []int {
 	return output
 }
 
-func getMinValueIndex(values *[]int) int {
+func getMinValue(values *[]int) int {
 	minValue := (*values)[0]
 	for _, value := range *values {
 		if value < minValue {
