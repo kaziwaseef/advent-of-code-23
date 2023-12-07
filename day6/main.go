@@ -5,6 +5,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/kaziwaseef/advent-of-code-23/utils"
 )
@@ -16,12 +17,26 @@ func Part1() {
 	fmt.Println(alg(&races))
 }
 
+func Part2() {
+	fmt.Println("Day 6 Part 2")
+	input := utils.ReadFileAsLines("day6/input.txt")
+	removeSpaces(&input)
+	races := formatInput(&input)
+	fmt.Println(alg(&races))
+}
+
 func alg(races *[]race) int {
 	product := 1
 	for _, race := range *races {
 		product *= race.numberOfWinsPossible()
 	}
 	return product
+}
+
+func removeSpaces(input *[]string) {
+	for i := 0; i < len(*input); i++ {
+		(*input)[i] = strings.ReplaceAll((*input)[i], " ", "")
+	}
 }
 
 func formatInput(input *[]string) []race {

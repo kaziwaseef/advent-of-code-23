@@ -29,5 +29,6 @@ func main() {
 	// day5.Part2()
 	fmt.Println("---")
 	day6.Part1()
+	day6.Part2()
 	fmt.Println("---")
 }
